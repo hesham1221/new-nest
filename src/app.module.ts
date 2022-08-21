@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import {TweetModule} from './tweet/tweet.module'
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Tweet } from './tweet/tweet.model';
+import { TweetModule } from './tweets/Tweets.module';
 @Module({
   imports: [SequelizeModule.forRoot({
     dialect: 'postgres',
@@ -12,8 +11,11 @@ import { Tweet } from './tweet/tweet.model';
     username: 'postgres',
     password: 'root',
     database: 'tweets',
-    models: [Tweet],
-  }),TweetModule],
+    autoLoadModels : true,
+    synchronize : true,
+  }),
+  TweetModule
+],
   controllers: [AppController],
   providers: [AppService],
 })
