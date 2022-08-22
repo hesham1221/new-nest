@@ -6,7 +6,8 @@ import { TweetModule } from './tweets/Tweets.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-import { TweetsResolver } from './tweets/Tweets.resolver';
+import { AuthorModule } from './author/author.module';
+
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -15,18 +16,19 @@ import { TweetsResolver } from './tweets/Tweets.resolver';
       playground: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
-    ,SequelizeModule.forRoot({
-    dialect: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'root',
-    database: 'tweets',
-    autoLoadModels : true,
-    synchronize : true,
-  }),
-  TweetModule
-],
+    SequelizeModule.forRoot({
+      dialect: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'root',
+      database: 'tweets',
+      autoLoadModels : true,
+      synchronize : true,
+    }),
+    TweetModule,
+    AuthorModule
+  ],
   controllers: [AppController],
   providers: [AppService ],
 })

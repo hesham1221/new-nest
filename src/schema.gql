@@ -1,0 +1,59 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Author {
+  id: Int!
+  name: String!
+  tweets: [Tweet!]
+}
+
+type Tweet {
+  id: Int!
+  content: String!
+  authorId: Int!
+  author: Author!
+}
+
+type Message {
+  message: String!
+}
+
+type Query {
+  tweet: [Tweet!]!
+  getATweet(getATweet: getATweetDto!): Tweet!
+  author: [Author!]!
+  findOneAuthor(id: Int!): Author!
+}
+
+input getATweetDto {
+  id: Int!
+}
+
+type Mutation {
+  updateATweet(updateATweet: UpdateATweet!): Tweet!
+  DeleteATweet(deleteATweet: getATweetDto!): Message!
+  createATweet(createTweetInput: CreateTweetInput!): Tweet!
+  createAuthor(createAuthorInput: CreateAuthorInput!): Author!
+  updateAuthor(updateAuthorInput: UpdateAuthorInput!): Author!
+  removeAuthor(id: Int!): Author!
+}
+
+input UpdateATweet {
+  id: Int!
+  content: String!
+}
+
+input CreateTweetInput {
+  content: String!
+  authorId: Float!
+}
+
+input CreateAuthorInput {
+  name: String!
+}
+
+input UpdateAuthorInput {
+  id: Int!
+  name: String!
+}
