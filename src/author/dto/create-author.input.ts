@@ -1,8 +1,13 @@
 import { InputType, Int, Field } from '@nestjs/graphql';
+import { MinLength} from 'class-validator';
 
 @InputType()
 export class CreateAuthorInput {
   
   @Field()
-  name :string
+  username :string
+
+  @MinLength(8)
+  @Field()
+  password :string
 }

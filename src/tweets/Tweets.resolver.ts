@@ -1,10 +1,12 @@
 
-import { Args, Field, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
+import { UseGuards } from "@nestjs/common";
+import { Args, Context, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
 import { Author } from "src/author/entities/author.entity";
+import { AuthGuard } from "src/author/jwt.auth.guard";
 import { CreateTweetInput } from "./dto/create-tweet-input";
 import { getATweetDto } from "./dto/getATweet.dto";
 import { UpdateATweet } from "./dto/update-tweet-input";
-import { Message, Tweet } from "./Tweet.model";
+import { Message, Tweet, TweetRes } from "./Tweet.model";
 import { TweetsService } from "./Tweets.service";
 
 @Resolver(() => Tweet)
@@ -12,15 +14,17 @@ export class TweetsResolver {
     constructor(private TweetsService : TweetsService){}
 
 
-    @Query(() => [Tweet])
+    @Query(() => [Tweet] , {name : 'tweets'})
     tweet():Promise<Tweet[]>{
         return this.TweetsService.getAllTweets()
     }
 
-    @Query(() => Tweet)
-    getATweet(@Args('getATweet') getAtweet : getATweetDto):Promise<Tweet>{
-        return this.TweetsService.GetATweet(getAtweet.id)
-    }
+    @Query(() => [Tweet])
+    @UseGuards(new AuthGuard())
+    getMyTweets(@Context() context){
+        console.log(context.user)
+        return this.TweetsService.GetMyTweets(context)
+   }
     
     @ResolveField(() => Author)
     author(@Parent() tweet : Tweet):Promise<Author>{
@@ -32,12 +36,14 @@ export class TweetsResolver {
         return this.TweetsService.UpdateATweet(updateATweet)
     }
     @Mutation(() => Message)
-    DeleteATweet(@Args('deleteATweet') deleteATweet : getATweetDto):Promise<Message>{
-        return this.TweetsService.DeleteATweet(deleteATweet.id)
+    @UseGuards(new AuthGuard())
+    DeleteATweet(@Args('deleteATweet') deleteATweet : getATweetDto , @Context() context):Promise<Message>{
+        return this.TweetsService.DeleteATweet(deleteATweet.id , context)
     }
     
     @Mutation(() => Tweet )
-    createATweet(@Args('createTweetInput') createTweetInput : CreateTweetInput):Promise<Tweet>{
-        return this.TweetsService.addTweet(createTweetInput)
+    @UseGuards(new AuthGuard())
+    createATweet(@Args('createTweetInput') createTweetInput : CreateTweetInput , @Context()context):Promise<Tweet>{
+        return this.TweetsService.addTweet(createTweetInput , context)
     }
 }

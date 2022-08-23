@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { AuthorModule } from "src/author/author.module";
+import { jwtStratagey } from "src/author/jwt.stratagy";
 import { TweetController } from "./Tweet.controller";
 import { Tweet } from "./Tweet.model";
 import { TweetsResolver } from "./Tweets.resolver";

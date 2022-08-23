@@ -4,7 +4,8 @@
 
 type Author {
   id: Int!
-  name: String!
+  username: String!
+  password: String!
   tweets: [Tweet!]
 }
 
@@ -19,15 +20,22 @@ type Message {
   message: String!
 }
 
+type AuthMessage {
+  token: String!
+  username: String!
+}
+
 type Query {
-  tweet: [Tweet!]!
-  getATweet(getATweet: getATweetDto!): Tweet!
-  author: [Author!]!
+  tweets: [Tweet!]!
+  getMyTweets: [Tweet!]!
+  login(loginInput: CreateAuthorInput!): AuthMessage!
+  authors: [Author!]!
   findOneAuthor(id: Int!): Author!
 }
 
-input getATweetDto {
-  id: Int!
+input CreateAuthorInput {
+  username: String!
+  password: String!
 }
 
 type Mutation {
@@ -36,7 +44,7 @@ type Mutation {
   createATweet(createTweetInput: CreateTweetInput!): Tweet!
   createAuthor(createAuthorInput: CreateAuthorInput!): Author!
   updateAuthor(updateAuthorInput: UpdateAuthorInput!): Author!
-  removeAuthor(id: Int!): Author!
+  removeAuthor(username: String!): Message!
 }
 
 input UpdateATweet {
@@ -44,16 +52,15 @@ input UpdateATweet {
   content: String!
 }
 
-input CreateTweetInput {
-  content: String!
-  authorId: Float!
+input getATweetDto {
+  id: Int!
 }
 
-input CreateAuthorInput {
-  name: String!
+input CreateTweetInput {
+  content: String!
 }
 
 input UpdateAuthorInput {
-  id: Int!
-  name: String!
+  oldUsername: String!
+  newUsername: String!
 }

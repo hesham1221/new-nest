@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field, Int} from '@nestjs/graphql';
 import { AutoIncrement, Column, HasMany, Model, PrimaryKey, Table  } from 'sequelize-typescript';
 import { Tweet } from 'src/tweets/Tweet.model';
 
@@ -13,11 +13,17 @@ export class Author extends Model<Author> {
 
   @Column
   @Field()
-  name :string
+  username :string
 
+  @Column
+  @Field()
+  password : string
 
   @HasMany(() => Tweet)
   @Field(() => [Tweet],{nullable : true})
   tweets? : Tweet[]
 
 }
+
+
+

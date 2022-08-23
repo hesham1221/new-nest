@@ -7,6 +7,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { AuthorModule } from './author/author.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthorModule } from './author/author.module';
       debug: false,
       playground: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      context : ({req}) => ({headers : req.headers}),
     }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
@@ -26,6 +28,9 @@ import { AuthorModule } from './author/author.module';
       autoLoadModels : true,
       synchronize : true,
     }),
+    ConfigModule.forRoot({
+      ignoreEnvFile: true,
+    }),    
     TweetModule,
     AuthorModule
   ],

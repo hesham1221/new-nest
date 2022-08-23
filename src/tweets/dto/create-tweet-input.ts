@@ -5,7 +5,4 @@ import { IsAlpha } from "class-validator";
 export class CreateTweetInput {
     @Field()
     content : string
-    
-    @Field()
-    authorId : number
 }
