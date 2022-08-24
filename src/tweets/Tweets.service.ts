@@ -58,6 +58,14 @@ export class TweetsService {
     }
   }
 
+  async likers(tweetId : number){
+    try {
+      return await this.authorService.findAll({where : {tweetId}})
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
   async DeleteATweet(id: number , context) {
     const tweet = await this.TweetModel.findOne({where : {id}})
     if(!tweet){

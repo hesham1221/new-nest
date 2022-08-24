@@ -16,6 +16,7 @@ import {
   getMyFollowersOutPut,
   MyFollowersOutPut,
 } from './dto/getMyFollowers.output';
+import sequelize from 'sequelize';
 @Injectable()
 export class AuthorService {
   constructor(
@@ -38,6 +39,13 @@ export class AuthorService {
       return await this.AuthorModel.findAll({ include: [Tweet] });
     } catch (error) {
       throw new Error(error);
+    }
+  }
+  async findLikers(tweetId : number) : Promise<Author[]>{
+    try{
+      return await this.AuthorModel.findAll({where : tweetId})
+    }catch(err){
+      throw new Error(err)
     }
   }
 
@@ -120,8 +128,10 @@ export class AuthorService {
       })
       await this.FollowModel.create({
         followedId: followed.id,
-        followerId: context.author.id,
+        followerId: context.author.id, 
       });
+      await this.AuthorModel.increment('followers' , {by : 1 , where : {id : followed.id}})
+      await this.AuthorModel.increment('following' , {by : 1 , where : {id : context.author.id}})
       return {
         message: `${context.author.username} has just followed ${followed.username}`,
       };

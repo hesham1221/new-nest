@@ -6,8 +6,9 @@ type Author {
   id: Int!
   username: String!
   password: String!
-  followers: [Author!]
-  follwing: [Author!]
+  followers: Int!
+  following: Int!
+  tweetId: Int!
   tweets: [Tweet!]
 }
 
@@ -15,6 +16,7 @@ type Tweet {
   id: Int!
   content: String!
   authorId: Int!
+  likers: [Author!]!
   author: Author!
 }
 
@@ -53,7 +55,7 @@ type getWhoIFollowOutput {
 }
 
 type Query {
-  tweet: GetAllTweetInput!
+  tweets: GetAllTweetInput!
   getMyTweets: [Tweet!]!
   login(loginInput: CreateAuthorInput!): AuthMessage!
   authors: [Author!]!

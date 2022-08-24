@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, Context, ResolveField } from '@nestjs/graphql';
 import { AuthorService } from './author.service';
 import { Author } from './entities/author.entity';
 import { CreateAuthorInput } from './dto/create-author.input';

@@ -1,6 +1,5 @@
 import { Field, Int, ObjectType } from "@nestjs/graphql";
 import { AutoIncrement, Column, ForeignKey, Model, PrimaryKey, Table } from "sequelize-typescript";
-import { Author } from "./author.entity";
 
 @Table
 

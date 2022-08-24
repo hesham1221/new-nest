@@ -4,6 +4,7 @@ import {
   BelongsTo,
   Column,
   ForeignKey,
+  HasMany,
   Model,
   PrimaryKey,
   Table,
@@ -27,6 +28,10 @@ export class Tweet extends Model<Tweet> {
   @Column
   @Field(() => Int)
   authorId: number;
+
+  @HasMany(() => Author)
+  @Field(() => [Author])
+  likers : Author
 
   @BelongsTo(() => Author)
   @Field(() => Author)
