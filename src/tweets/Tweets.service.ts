@@ -1,10 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op } from 'sequelize';
+
 import { AuthorService } from 'src/author/author.service';
 import { Author } from 'src/author/entities/author.entity';
 import { CreateTweetInput } from './dto/create-tweet-input';
 import { UpdateATweet } from './dto/update-tweet-input';
-import { Tweet } from './Tweet.model';
+import { GetAllTweetInput, Tweet } from './Tweet.model';
 
 @Injectable()
 export class TweetsService {
@@ -13,9 +15,14 @@ export class TweetsService {
     private authorService: AuthorService,
   ) {}
 
-  async getAllTweets(): Promise<Tweet[]> {
+  async getAllTweets(context): Promise<GetAllTweetInput> {
     try {
-      return await this.TweetModel.findAll({ include: [Author] });
+      const myTweets:Tweet[] = await this.TweetModel.findAll({where : {authorId : context.author.id } })
+      const otherTweets:Tweet[] = await this.TweetModel.findAll({where: {$authorId$: { [Op.not]: context.author.id}}})
+      return {
+        myTweets,
+        otherTweets
+      }
     } catch (error) {
       throw new Error(error);
     }
@@ -24,7 +31,7 @@ export class TweetsService {
     const { content } = createTweetInput;
     try {
       const res = await this.TweetModel.create(
-        { content ,authorId : context.user.id},
+        { content ,authorId : context.author.id},
         { include: [Author] },
       );
       return res;
@@ -35,7 +42,7 @@ export class TweetsService {
 
   async GetMyTweets(context) {
     try {
-      const Tweets = this.TweetModel.findAll({where : {authorId : context.user.id}})
+      const Tweets = this.TweetModel.findAll({where : {authorId : context.author.id}})
 
       return Tweets
     } catch (error) {
@@ -45,18 +52,27 @@ export class TweetsService {
 
   async author(id: number) {
     try {
-      return this.authorService.findOne(id);
+      return await this.authorService.findOne(id);
     } catch (error) {
       throw new Error(error);
     }
   }
 
   async DeleteATweet(id: number , context) {
-    try {
-      await this.TweetModel.destroy({ where: { id } });
-      return { message: 'deleted successfully' };
-    } catch (error) {
-      throw new Error(error);
+    const tweet = await this.TweetModel.findOne({where : {id}})
+    if(!tweet){
+      throw new NotFoundException
+    }
+    if (tweet.authorId === context.author.id){
+      try {
+        await this.TweetModel.destroy({ where: { id } });
+        return { message: 'deleted successfully' };
+      } catch (error) {
+        throw new Error(error);
+      }
+    }
+    else{
+      throw new UnauthorizedException
     }
   }
 

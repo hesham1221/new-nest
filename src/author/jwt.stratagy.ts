@@ -8,7 +8,7 @@ export class jwtStratagey extends PassportStrategy(Strategy){
         super({
             jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration : false,
-            secretOrKey : 'baianat-tweeter',
+            secretOrKey : process.env.SECRET,
             logging : true
         })
     }

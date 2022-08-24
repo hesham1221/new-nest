@@ -29,7 +29,6 @@ import { ConfigModule } from '@nestjs/config';
       synchronize : true,
     }),
     ConfigModule.forRoot({
-      ignoreEnvFile: true,
     }),    
     TweetModule,
     AuthorModule

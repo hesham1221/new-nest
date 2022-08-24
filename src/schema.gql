@@ -6,6 +6,8 @@ type Author {
   id: Int!
   username: String!
   password: String!
+  followers: [Author!]
+  follwing: [Author!]
   tweets: [Tweet!]
 }
 
@@ -20,17 +22,44 @@ type Message {
   message: String!
 }
 
+type GetAllTweetInput {
+  myTweets: [Tweet!]!
+  otherTweets: [Tweet!]!
+}
+
 type AuthMessage {
   token: String!
   username: String!
 }
 
+type MyFollowersOutPut {
+  id: Int!
+  username: String!
+}
+
+type getMyFollowersOutPut {
+  numberOfFollowers: Int!
+  followers: [MyFollowersOutPut!]!
+}
+
+type MyFollowingOutPut {
+  id: Int!
+  username: String!
+}
+
+type getWhoIFollowOutput {
+  numberOfFollowing: Int!
+  whoYouFollowers: [MyFollowingOutPut!]!
+}
+
 type Query {
-  tweets: [Tweet!]!
+  tweet: GetAllTweetInput!
   getMyTweets: [Tweet!]!
   login(loginInput: CreateAuthorInput!): AuthMessage!
   authors: [Author!]!
   findOneAuthor(id: Int!): Author!
+  getMyFollowers: getMyFollowersOutPut!
+  getWhoIFollow: getWhoIFollowOutput!
 }
 
 input CreateAuthorInput {
@@ -45,6 +74,7 @@ type Mutation {
   createAuthor(createAuthorInput: CreateAuthorInput!): Author!
   updateAuthor(updateAuthorInput: UpdateAuthorInput!): Author!
   removeAuthor(username: String!): Message!
+  follow(username: String!): Message!
 }
 
 input UpdateATweet {

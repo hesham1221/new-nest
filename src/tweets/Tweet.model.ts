@@ -50,3 +50,12 @@ export class TweetRes {
   @Field()
   code: number;
 }
+
+@ObjectType()
+export class GetAllTweetInput{
+    @Field(() => [Tweet])
+    myTweets : Tweet[]
+
+    @Field(() => [Tweet])
+    otherTweets : Tweet[]
+}

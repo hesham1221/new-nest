@@ -6,7 +6,7 @@ import { AuthGuard } from "src/author/jwt.auth.guard";
 import { CreateTweetInput } from "./dto/create-tweet-input";
 import { getATweetDto } from "./dto/getATweet.dto";
 import { UpdateATweet } from "./dto/update-tweet-input";
-import { Message, Tweet, TweetRes } from "./Tweet.model";
+import { GetAllTweetInput, Message, Tweet, TweetRes } from "./Tweet.model";
 import { TweetsService } from "./Tweets.service";
 
 @Resolver(() => Tweet)
@@ -14,15 +14,15 @@ export class TweetsResolver {
     constructor(private TweetsService : TweetsService){}
 
 
-    @Query(() => [Tweet] , {name : 'tweets'})
-    tweet():Promise<Tweet[]>{
-        return this.TweetsService.getAllTweets()
+    @Query(() => GetAllTweetInput )
+    @UseGuards(new AuthGuard())
+    tweet(@Context() context):Promise<GetAllTweetInput>{
+        return this.TweetsService.getAllTweets(context)
     }
 
     @Query(() => [Tweet])
     @UseGuards(new AuthGuard())
     getMyTweets(@Context() context){
-        console.log(context.user)
         return this.TweetsService.GetMyTweets(context)
    }
     

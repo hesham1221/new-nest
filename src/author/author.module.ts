@@ -3,15 +3,11 @@ import { AuthorService } from './author.service';
 import { AuthorResolver } from './author.resolver';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Author } from './entities/author.entity';
-import { jwtStratagey } from './jwt.stratagy';
-import { JwtModule } from '@nestjs/jwt';
+import { Follow } from './entities/follow.entity';
 
 @Module({
-  providers: [AuthorResolver, AuthorService, jwtStratagey],
-  imports : [SequelizeModule.forFeature([Author]) , JwtModule.register({
-    signOptions : {expiresIn : '300s'},
-    secret : 'baianat-tweeter'
-  })],
-  exports :[AuthorService , jwtStratagey]
+  providers: [AuthorResolver, AuthorService],
+  imports : [SequelizeModule.forFeature([Author]) , SequelizeModule.forFeature([Follow])],
+  exports :[AuthorService]
 })
 export class AuthorModule {}

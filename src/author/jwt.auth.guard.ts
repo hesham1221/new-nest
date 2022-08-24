@@ -15,7 +15,7 @@ import {
       if (!ctx.headers.authorization) {
         return false;
       }
-      ctx.user = await this.validateToken(ctx.headers.authorization);
+      ctx.author = await this.validateToken(ctx.headers.authorization);
       return true;
     }
   
@@ -26,7 +26,7 @@ import {
       const token = auth.split(' ')[1];
   
       try {
-        const decoded = jwt.verify(token, 'baianat-tweeter');
+        const decoded = jwt.verify(token, process.env.SECRET);
         return decoded;
       } catch (err) {
         const message = 'Token error: ' + (err.message || err.name);
