@@ -2,6 +2,7 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 import {
   AutoIncrement,
   BelongsTo,
+  BelongsToMany,
   Column,
   ForeignKey,
   HasMany,
@@ -9,7 +10,9 @@ import {
   PrimaryKey,
   Table,
 } from 'sequelize-typescript';
+import { MyFollowersOutPut } from 'src/author/dto/getMyFollowers.output';
 import { Author } from 'src/author/entities/author.entity';
+import { likers } from './likers.model';
 
 @Table
 @ObjectType()
@@ -29,9 +32,9 @@ export class Tweet extends Model<Tweet> {
   @Field(() => Int)
   authorId: number;
 
-  @HasMany(() => Author)
-  @Field(() => [Author])
-  likers : Author
+  @HasMany(() => likers)
+  @Field(() => [MyFollowersOutPut] , {nullable : true})
+  likers? : MyFollowersOutPut[]
 
   @BelongsTo(() => Author)
   @Field(() => Author)

@@ -2,13 +2,22 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type MyFollowersOutPut {
+  id: Int!
+  username: String!
+}
+
+type getMyFollowersOutPut {
+  numberOfFollowers: Int!
+  followers: [MyFollowersOutPut!]!
+}
+
 type Author {
   id: Int!
   username: String!
   password: String!
   followers: Int!
   following: Int!
-  tweetId: Int!
   tweets: [Tweet!]
 }
 
@@ -16,7 +25,7 @@ type Tweet {
   id: Int!
   content: String!
   authorId: Int!
-  likers: [Author!]!
+  likers: [MyFollowersOutPut!]
   author: Author!
 }
 
@@ -32,16 +41,6 @@ type GetAllTweetInput {
 type AuthMessage {
   token: String!
   username: String!
-}
-
-type MyFollowersOutPut {
-  id: Int!
-  username: String!
-}
-
-type getMyFollowersOutPut {
-  numberOfFollowers: Int!
-  followers: [MyFollowersOutPut!]!
 }
 
 type MyFollowingOutPut {
@@ -77,6 +76,7 @@ type Mutation {
   updateAuthor(updateAuthorInput: UpdateAuthorInput!): Author!
   removeAuthor(username: String!): Message!
   follow(username: String!): Message!
+  like(tweetId: Int!): Message!
 }
 
 input UpdateATweet {

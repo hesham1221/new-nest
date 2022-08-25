@@ -60,7 +60,7 @@ export class TweetsService {
 
   async likers(tweetId : number){
     try {
-      return await this.authorService.findAll({where : {tweetId}})
+      return await this.authorService.findLikers(tweetId)
     } catch (error) {
       throw new Error(error)
     }

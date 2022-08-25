@@ -1,6 +1,7 @@
 
 import { UseGuards } from "@nestjs/common";
 import { Args, Context, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
+import { MyFollowersOutPut } from "src/author/dto/getMyFollowers.output";
 import { Author } from "src/author/entities/author.entity";
 import { AuthGuard } from "src/author/jwt.auth.guard";
 import { CreateTweetInput } from "./dto/create-tweet-input";
@@ -29,6 +30,10 @@ export class TweetsResolver {
     @ResolveField(() => Author)
     author(@Parent() tweet : Tweet):Promise<Author>{
         return this.TweetsService.author(tweet.authorId)
+    }
+    @ResolveField(() => [MyFollowersOutPut])
+    likers(@Parent() tweet : Tweet):Promise<MyFollowersOutPut[] | {message :string }>{
+        return this.TweetsService.likers(tweet.id)
     }
 
     @Mutation(() => Tweet)

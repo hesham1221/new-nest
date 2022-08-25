@@ -1,7 +1,7 @@
 import { ObjectType, Field, Int} from '@nestjs/graphql';
 
-import { AutoIncrement, BelongsTo, Column, Default, ForeignKey, HasMany, Model, PrimaryKey, Table  } from 'sequelize-typescript';
-import { Sequelize } from 'sequelize/types';
+import { AutoIncrement, BelongsTo, BelongsToMany, Column, Default, HasMany, Model, PrimaryKey, Table  } from 'sequelize-typescript';
+import { likers } from 'src/tweets/likers.model';
 
 import { Tweet } from 'src/tweets/Tweet.model';
 
@@ -25,17 +25,16 @@ export class Author extends Model<Author> {
   @Default(0)
   @Column
   @Field(() => Int)
-  followers : number
+  followers : number 
 
   @Default(0) 
   @Column
   @Field(() => Int)
   following : number
 
-  @ForeignKey(() => Tweet)
-  @Column
-  @Field(() => Int)
-  tweetId: number;
+  
+  @HasMany(() => likers)
+  likedTweets : Tweet[]
 
   @HasMany(() => Tweet)
   @Field(() => [Tweet],{nullable : true})

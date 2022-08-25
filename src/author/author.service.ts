@@ -17,11 +17,13 @@ import {
   MyFollowersOutPut,
 } from './dto/getMyFollowers.output';
 import sequelize from 'sequelize';
+import { likers } from 'src/tweets/likers.model';
 @Injectable()
 export class AuthorService {
   constructor(
     @InjectModel(Author) private AuthorModel: typeof Author,
     @InjectModel(Follow) private FollowModel: typeof Follow,
+    @InjectModel(likers) private likersModel : typeof likers
   ) {}
 
   async create(createAuthorInput: CreateAuthorInput): Promise<Author> {
@@ -41,9 +43,22 @@ export class AuthorService {
       throw new Error(error);
     }
   }
-  async findLikers(tweetId : number) : Promise<Author[]>{
+  async findLikers(tweetId : number) : Promise<MyFollowersOutPut[] | {message :string }>{
     try{
-      return await this.AuthorModel.findAll({where : tweetId})
+      const likersIndexes = []
+      const tweetLikers = await this.likersModel.findAll({where : {tweetId}})
+      if(tweetLikers.length === 0 || !tweetLikers){
+        return {
+          message : 'No Likers were Found'
+        }
+      }
+      tweetLikers.forEach(liker => likersIndexes.push(liker.authorId))
+      const allLikers = await this.AuthorModel.findAll({where : {id : {[Op.in] : likersIndexes} }})
+      const likers: MyFollowersOutPut[] = allLikers.map((follow) => ({
+        username: follow.username,
+        id: follow.id,
+      }));
+      return likers
     }catch(err){
       throw new Error(err)
     }
@@ -193,4 +208,22 @@ export class AuthorService {
       throw new Error(error);
     }
   }
+
+  async like(tweetId , context){
+    try {
+      const likedTweet = await this.likersModel.findOne({where : {authorId : context.author.id , tweetId}})
+      if (likedTweet){
+        return {
+          message : "you have already liked the tweet"
+        }
+      }
+      await this.likersModel.create({authorId : context.author.id , tweetId})
+      return {
+        message : `${context.author.userame} have just liked tweet with id of ${tweetId}`
+      }
+    } catch (error) { 
+      throw new Error(error)
+    }
+  }
+
 }

@@ -60,5 +60,10 @@ export class AuthorResolver {
     return this.authorService.follow(username , context)
   }
 
+  @Mutation(() => Message)
+  @UseGuards(new AuthGuard())
+  like(@Args('tweetId' , {type : () => Int})tweetId : number , @Context()context){
+    return this.authorService.like(tweetId , context)
+  }
 
 }
