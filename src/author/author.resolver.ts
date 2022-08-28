@@ -34,8 +34,8 @@ export class AuthorResolver {
   }
   @Mutation(() => Author)
   @UseGuards(new AuthGuard())
-  updateAuthor(@Args('updateAuthorInput') updateAuthorInput: UpdateAuthorInput) {
-    return this.authorService.update(updateAuthorInput);
+  updateAuthor(@Args('updateAuthorInput') updateAuthorInput: UpdateAuthorInput , @Context() context) {
+    return this.authorService.update(updateAuthorInput , context);
   }
   @Mutation(() => Message)
   @UseGuards(new AuthGuard())

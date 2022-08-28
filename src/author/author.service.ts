@@ -100,16 +100,29 @@ export class AuthorService {
     }
   }
 
-  async update(updateAuthorInput: UpdateAuthorInput): Promise<Author> {
-    const { oldUsername, newUsername } = updateAuthorInput;
+  async update(updateAuthorInput: UpdateAuthorInput , context): Promise<Author> {
+    const {oldPassword ,password, ...others } = updateAuthorInput;
     try {
-      await this.AuthorModel.update(
-        { username: newUsername },
-        { where: { username: oldUsername } },
-      );
-      return await this.AuthorModel.findOne({
-        where: { username: newUsername },
-      });
+
+      const user = await this.AuthorModel.findOne({where : {id : context.author.id}})
+
+      if (await bcrypt.compare(oldPassword , user.password)){
+        if(password){
+          const newPassword = await bcrypt.hash(password , 10)
+          await this.AuthorModel.update({password : newPassword , ...others} , {where : {id : context.author.id}});
+          return await this.AuthorModel.findOne({
+          where: {id : context.author.id},
+        });
+        }else{
+          await this.AuthorModel.update({...others} , {where : {id : context.author.id}});
+          return await this.AuthorModel.findOne({
+            where: {id : context.author.id},
+          });
+        }
+        
+      }else {
+        throw new UnauthorizedException('old password incorrect')
+      }
     } catch (error) {
       throw new Error(error);
     }
@@ -130,7 +143,6 @@ export class AuthorService {
       if (!followed) {
         throw new NotFoundException('author you want to follow not found');
       }
-      console.log(followed.id , context.author.authorId)
       if(followed.id === context.author.id){
         throw new Error('You can\'t follow yourself')
       }

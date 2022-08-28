@@ -15,7 +15,6 @@ type getMyFollowersOutPut {
 type Author {
   id: Int!
   username: String!
-  password: String!
   followers: Int!
   following: Int!
   tweets: [Tweet!]
@@ -93,6 +92,7 @@ input CreateTweetInput {
 }
 
 input UpdateAuthorInput {
-  oldUsername: String!
-  newUsername: String!
+  username: String
+  oldPassword: String!
+  password: String
 }

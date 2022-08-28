@@ -5,9 +5,13 @@ import { IsAlpha } from 'class-validator';
 @InputType()
 export class UpdateAuthorInput {
 
+  @Field({nullable : true})
+  username: string;
+
   @Field()
-  oldUsername : string
-  @IsAlpha()
-  @Field()
-  newUsername: string;
+  oldPassword : string
+
+  @Field({nullable : true})
+  password : string
+
 }
