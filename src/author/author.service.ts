@@ -10,14 +10,14 @@ import { UpdateAuthorInput } from './dto/update-author.input';
 import { Author } from './entities/author.entity';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
-import { Follow } from './entities/follow.entity';
 import { Op } from 'sequelize';
 import {
   getMyFollowersOutPut,
   MyFollowersOutPut,
 } from './dto/getMyFollowers.output';
-import sequelize from 'sequelize';
 import { likers } from 'src/tweets/likers.model';
+import { Follow } from './entities/following.entity';
+import { findAllOutput } from './entities/finAllAuthor.output';
 @Injectable()
 export class AuthorService {
   constructor(
@@ -36,9 +36,11 @@ export class AuthorService {
     }
   }
 
-  async findAll(): Promise<Author[]> {
+  async findAll(): Promise<findAllOutput[]> {
     try {
-      return await this.AuthorModel.findAll({ include: [Tweet] });
+      const users = await this.AuthorModel.findAll({ include: [Tweet] });
+      const output = users.map(user => ({username : user.username , id : user.id}))
+      return output
     } catch (error) {
       throw new Error(error);
     }
@@ -66,6 +68,9 @@ export class AuthorService {
 
   async findOne(id: number): Promise<Author> {
     try {
+      const countOfFollowers = await this.FollowModel.count({where : {followedId : id}})
+      const countOfFollowed = await this.FollowModel.count({where : {followerId : id}})
+      await this.AuthorModel.update({numFollowing : countOfFollowed , numFollowers :countOfFollowers } , {where : {id}})
       return await this.AuthorModel.findOne({ where: { id } });
     } catch (error) {
       throw new NotFoundException();
@@ -130,6 +135,7 @@ export class AuthorService {
 
   async remove(username: string): Promise<Message> {
     try {
+      await this.AuthorModel.increment({numFollowers : -1} , {where : {}})
       await this.AuthorModel.destroy({ where: { username } });
       return { message: 'deleted successfully' };
     } catch (error) {
@@ -147,7 +153,7 @@ export class AuthorService {
         throw new Error('You can\'t follow yourself')
       }
 
-      const allFollowRecords = await this.FollowModel.findAll({where : {followedId : followed.id}})
+      const allFollowRecords = await this.FollowModel.findAll({where : {followedId : followed.id , followerId : context.author.id}})
       allFollowRecords.forEach(follow => {
         if (follow.followerId === context.author.id){
           throw new Error('You have already followed this author')
@@ -157,13 +163,40 @@ export class AuthorService {
         followedId: followed.id,
         followerId: context.author.id, 
       });
-      await this.AuthorModel.increment('followers' , {by : 1 , where : {id : followed.id}})
-      await this.AuthorModel.increment('following' , {by : 1 , where : {id : context.author.id}})
+      // const countOfFollowers_follower = await this.FollowModel.count({where : {followedId : context.author.id}})
+      // const countOfFollowed_follower = await this.FollowModel.count({where : {followerId : context.author.id}})
+      // const countOfFollowed_followed = await this.FollowModel.count({where : {followedId : followed.id}})
+      // const countOfFollowers_followed = await this.FollowModel.count({where : {followerId : followed.id}})
+      // await this.AuthorModel.update({numFollowing : countOfFollowed_follower , numFollowers :countOfFollowers_follower } , {where : {id : context.author.id}})
+      // await this.AuthorModel.update({numFollowing : countOfFollowed_followed , numFollowers :countOfFollowers_followed } , {where : {id : followed.id}})
+      await this.AuthorModel.increment({numFollowing : 1},{where : {id : context.author.id}})
+      await this.AuthorModel.increment({numFollowers : 1},{where : {id : followed.id}})
       return {
         message: `${context.author.username} has just followed ${followed.username}`,
       };
     } catch (err) {
       throw new Error(err);
+    }
+  }
+
+  async unfollow(username : string , context){
+    try {
+      const followed = await this.AuthorModel.findOne({ where: { username } });
+      if (!followed) {
+        throw new NotFoundException('author you want to follow not found');
+      }
+      const followRecord = await this.FollowModel.findOne({where : {followedId : followed.id , followerId : context.author.id}})
+      if(!followRecord){
+        throw new Error('You don\'t follow this author')
+      }
+      await this.FollowModel.destroy({where : {followedId : followed.id , followerId : context.author.id}})
+      await this.AuthorModel.increment({numFollowing : -1},{where : {id : context.author.id}})
+      await this.AuthorModel.increment({numFollowers : -1},{where : {id : followed.id}})
+      return {
+        message : `success`
+      }
+    } catch (error) {
+      
     }
   }
 

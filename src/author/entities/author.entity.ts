@@ -4,6 +4,7 @@ import { AutoIncrement, BelongsTo, BelongsToMany, Column, Default, HasMany, Mode
 import { likers } from 'src/tweets/likers.model';
 
 import { Tweet } from 'src/tweets/Tweet.model';
+import { Follow} from './following.entity';
 
 @ObjectType()
 @Table
@@ -25,19 +26,26 @@ export class Author extends Model<Author> {
   @Default(0)
   @Column
   @Field(() => Int)
-  followers : number 
+  numFollowers : number 
 
   @Default(0) 
   @Column
   @Field(() => Int)
-  following : number
+  numFollowing : number
 
   
+  @HasMany(() => Follow ,{ onDelete: 'cascade' , foreignKey : "followerId"})
+  follower : Follow[]
+
+  @HasMany(() => Follow , { onDelete: 'cascade' , foreignKey : "followedId"})
+  followed : Follow[]
+
+
   @HasMany(() => likers , { onDelete: 'cascade'})
   likedTweets : Tweet[]
 
   @HasMany(() => Tweet , { onDelete: 'cascade'})
-  @Field(() => [Tweet],{nullable : true})
+  @Field(() => [Tweet],{nullable : true}) 
   tweets? : Tweet[]
 
 }

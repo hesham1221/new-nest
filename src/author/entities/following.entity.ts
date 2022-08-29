@@ -1,5 +1,6 @@
-import { Field, Int, ObjectType } from "@nestjs/graphql";
+import { Field, Int } from "@nestjs/graphql";
 import { AutoIncrement, Column, ForeignKey, Model, PrimaryKey, Table } from "sequelize-typescript";
+import { Author } from "./author.entity";
 
 @Table
 
@@ -10,12 +11,14 @@ export class Follow extends Model<Follow>{
     @Field(() => Int)
     id:number
 
-    @Column
+    @ForeignKey(() => Author) 
+    @Column({onDelete : 'cascade' , onUpdate : "cascade"})
     @Field(() => Int)
     followerId : number
 
-    @Column
+    @ForeignKey(() => Author)
+    @Column({onDelete : 'cascade' , onUpdate : "cascade"})
     @Field(() => Int)
     followedId : number
-}
-
+} 
+ 

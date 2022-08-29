@@ -9,6 +9,7 @@ import { UseGuards } from '@nestjs/common';
 import { Message } from 'src/tweets/Tweet.model';
 import { getMyFollowersOutPut } from './dto/getMyFollowers.output';
 import { getWhoIFollowOutput } from './dto/getWhoIFollow.output';
+import { findAllOutput } from './entities/finAllAuthor.output';
 
 @Resolver(() => Author)
 export class AuthorResolver {
@@ -23,7 +24,7 @@ export class AuthorResolver {
     return this.authorService.Login(loginUnput)
   }
 
-  @Query(() => [Author], { name: 'authors' })
+  @Query(() => [findAllOutput], { name: 'authors' })
   author() {
     return this.authorService.findAll();
   }
@@ -64,6 +65,12 @@ export class AuthorResolver {
   @UseGuards(new AuthGuard())
   like(@Args('tweetId' , {type : () => Int})tweetId : number , @Context()context){
     return this.authorService.like(tweetId , context)
+  }
+
+  @Mutation(() => Message)
+  @UseGuards(new AuthGuard)
+  unfollow(@Args('username') username : string , @Context() context){
+    return this.authorService.unfollow(username , context)
   }
 
 }

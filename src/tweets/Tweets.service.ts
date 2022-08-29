@@ -13,7 +13,7 @@ export class TweetsService {
   constructor(
     @InjectModel(Tweet) private TweetModel: typeof Tweet,
     private authorService: AuthorService,
-  ) {}
+  ) {} 
 
   async getAllTweets(context): Promise<GetAllTweetInput> {
     try {

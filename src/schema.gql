@@ -15,8 +15,8 @@ type getMyFollowersOutPut {
 type Author {
   id: Int!
   username: String!
-  followers: Int!
-  following: Int!
+  numFollowers: Int!
+  numFollowing: Int!
   tweets: [Tweet!]
 }
 
@@ -52,11 +52,16 @@ type getWhoIFollowOutput {
   whoYouFollowers: [MyFollowingOutPut!]!
 }
 
+type findAllOutput {
+  username: String!
+  id: Int!
+}
+
 type Query {
   tweets: GetAllTweetInput!
   getMyTweets: [Tweet!]!
   login(loginInput: CreateAuthorInput!): AuthMessage!
-  authors: [Author!]!
+  authors: [findAllOutput!]!
   findOneAuthor(id: Int!): Author!
   getMyFollowers: getMyFollowersOutPut!
   getWhoIFollow: getWhoIFollowOutput!
@@ -76,6 +81,7 @@ type Mutation {
   removeAuthor(username: String!): Message!
   follow(username: String!): Message!
   like(tweetId: Int!): Message!
+  unfollow(username: String!): Message!
 }
 
 input UpdateATweet {
