@@ -44,12 +44,12 @@ export class AuthorResolver {
     return this.authorService.remove(username);
   }
 
-  @Query(() => getMyFollowersOutPut)
+  @Query(() => getMyFollowersOutPut , {name : "myFollowers"})
   @UseGuards(new AuthGuard())
   getMyFollowers(@Context() context) :Promise<getMyFollowersOutPut>{
     return this.authorService.getMyFollowers(context)
   }
-  @Query(() => getWhoIFollowOutput)
+  @Query(() => getWhoIFollowOutput , {name : "following"})
   @UseGuards(new AuthGuard())
   getWhoIFollow(@Context() context){
     return this.authorService.getWhoIFollow(context)

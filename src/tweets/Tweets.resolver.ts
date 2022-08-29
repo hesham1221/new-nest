@@ -21,7 +21,7 @@ export class TweetsResolver {
         return this.TweetsService.getAllTweets(context)
     }
 
-    @Query(() => [Tweet])
+    @Query(() => [Tweet] , {name : "myTweets"})
     @UseGuards(new AuthGuard())
     getMyTweets(@Context() context){
         return this.TweetsService.GetMyTweets(context)

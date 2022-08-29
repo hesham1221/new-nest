@@ -59,12 +59,12 @@ type findAllOutput {
 
 type Query {
   tweets: GetAllTweetInput!
-  getMyTweets: [Tweet!]!
+  myTweets: [Tweet!]!
   login(loginInput: CreateAuthorInput!): AuthMessage!
   authors: [findAllOutput!]!
   findOneAuthor(id: Int!): Author!
-  getMyFollowers: getMyFollowersOutPut!
-  getWhoIFollow: getWhoIFollowOutput!
+  myFollowers: getMyFollowersOutPut!
+  following: getWhoIFollowOutput!
 }
 
 input CreateAuthorInput {
