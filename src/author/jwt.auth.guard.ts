@@ -11,6 +11,7 @@ import {
   @Injectable()
   export class AuthGuard implements CanActivate {
     async canActivate(context: ExecutionContext): Promise<boolean> {
+     
       const ctx = GqlExecutionContext.create(context).getContext();
       if (!ctx.headers.authorization) {
         return false;

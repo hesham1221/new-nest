@@ -15,10 +15,9 @@ export class TweetsResolver {
     constructor(private TweetsService : TweetsService){}
 
 
-    @Query(() => GetAllTweetInput , {name : 'tweets'} )
-    @UseGuards(new AuthGuard())
-    tweet(@Context() context):Promise<GetAllTweetInput>{
-        return this.TweetsService.getAllTweets(context)
+    @Query(() => [Tweet] , {name : 'tweets'} )
+    tweet():Promise<Tweet[]>{
+        return this.TweetsService.getAllTweets()
     }
 
     @Query(() => [Tweet] , {name : "myTweets"})

@@ -27,6 +27,7 @@ import { ConfigModule } from '@nestjs/config';
       database: 'tweets',
       autoLoadModels : true,
       synchronize : true,
+      sync : {alter : true}
     }),
     ConfigModule.forRoot({
     }),    
@@ -34,6 +35,6 @@ import { ConfigModule } from '@nestjs/config';
     AuthorModule
   ],
   controllers: [AppController],
-  providers: [AppService ],
+  providers: [AppService ], 
 })
 export class AppModule {}

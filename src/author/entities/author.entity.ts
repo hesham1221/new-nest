@@ -20,6 +20,9 @@ export class Author extends Model<Author> {
   @Field()
   username :string
 
+  @Field()
+  following : boolean
+
   @Column
   password : string
 

@@ -11,6 +11,7 @@ import { Author } from './entities/author.entity';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
+import * as fs from 'fs/promises'
 import {
   getMyFollowersOutPut,
   MyFollowersOutPut,
@@ -18,6 +19,7 @@ import {
 import { likers } from 'src/tweets/likers.model';
 import { Follow } from './entities/following.entity';
 import { findAllOutput } from './entities/finAllAuthor.output';
+import { AuthMessage } from './dto/login-output';
 @Injectable()
 export class AuthorService {
   constructor(
@@ -26,33 +28,77 @@ export class AuthorService {
     @InjectModel(likers) private likersModel : typeof likers
   ) {}
 
-  async create(createAuthorInput: CreateAuthorInput): Promise<Author> {
+
+  async getProfilePhoto(context,response){
+      const user = await this.AuthorModel.findOne({where : {id : context.author.id}})
+      response.send()
+    }
+
+    async uploadPhoto(file){
+      try {
+        const { createReadStream } = file;
+  
+        const stream = createReadStream();
+        const chunks = [];
+  
+        const buffer = await new Promise<Buffer>((resolve, reject) => {
+          let buffer: Buffer;
+  
+          stream.on('data', function (chunk) {
+            chunks.push(chunk);
+          });
+  
+          stream.on('end', function () {
+            buffer = Buffer.concat(chunks);
+            resolve(buffer);
+          });
+  
+          stream.on('error', reject);
+        });
+  
+        const path = `/authors-profilePics/${Date.now()}-${file.filename}`
+        await fs.writeFile(`.${path}`, buffer);
+  
+        return path;
+      } catch (err) {
+        return err;
+      }
+    }
+
+  async create(createAuthorInput: CreateAuthorInput): Promise<AuthMessage> {
     const { username, password } = createAuthorInput;
     const newPassword: string = await bcrypt.hash(password, 10);
     try {
-      return await this.AuthorModel.create({ username, password: newPassword });
+      const author =  await this.AuthorModel.create({ username, password: newPassword });
+      return {
+        token: jwt.sign(
+          { username: author.username, id: author.id },
+          process.env.SECRET,
+          {
+            expiresIn: '30m',
+          },
+        ),
+        author : author,
+      };
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  async findAll(): Promise<findAllOutput[]> {
+  async findAll(): Promise<Author[]> {
     try {
       const users = await this.AuthorModel.findAll({ include: [Tweet] });
-      const output = users.map(user => ({username : user.username , id : user.id}))
-      return output
+      return users
     } catch (error) {
       throw new Error(error);
     }
   }
-  async findLikers(tweetId : number) : Promise<MyFollowersOutPut[] | {message :string }>{
+  async findLikers(tweetId : number) : Promise<MyFollowersOutPut[]>{
     try{
       const likersIndexes = []
       const tweetLikers = await this.likersModel.findAll({where : {tweetId}})
       if(tweetLikers.length === 0 || !tweetLikers){
-        return {
-          message : 'No Likers were Found'
-        }
+        return []
       }
       tweetLikers.forEach(liker => likersIndexes.push(liker.authorId))
       const allLikers = await this.AuthorModel.findAll({where : {id : {[Op.in] : likersIndexes} }})
@@ -89,10 +135,10 @@ export class AuthorService {
               { username: author.username, id: author.id },
               process.env.SECRET,
               {
-                expiresIn: '5m',
+                expiresIn: '30m',
               },
             ),
-            username: author.username,
+            author : author,
           };
         } else {
           throw UnauthorizedException;
@@ -103,6 +149,13 @@ export class AuthorService {
     } catch (error) {
       throw new NotFoundException('user not found');
     }
+  }
+
+  async valid(context){
+    console.log(context)
+    const author = await this.AuthorModel.findOne({where : {id : context.author.id}})
+    console.log(author)
+    return author
   }
 
   async update(updateAuthorInput: UpdateAuthorInput , context): Promise<Author> {
@@ -237,6 +290,7 @@ export class AuthorService {
       }
       const followeingIds = [];
       followInfo.forEach((follow) => followeingIds.push(follow.followedId));
+      
       const allFollowings = await this.AuthorModel.findAll({
         where: { id: { [Op.in]: followeingIds } },
       });

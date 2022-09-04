@@ -5,6 +5,6 @@ import { Author } from "../entities/author.entity"
 export class AuthMessage{
   @Field()
   token : string
-  @Field() 
-  username : string
+  @Field(() => Author) 
+  author : Author
 }

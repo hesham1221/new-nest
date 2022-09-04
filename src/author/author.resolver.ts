@@ -5,17 +5,33 @@ import { CreateAuthorInput } from './dto/create-author.input';
 import { UpdateAuthorInput } from './dto/update-author.input';
 import { AuthMessage } from './dto/login-output';
 import { AuthGuard} from './jwt.auth.guard';
-import { UseGuards } from '@nestjs/common';
+import { Res, UseGuards } from '@nestjs/common';
 import { Message } from 'src/tweets/Tweet.model';
 import { getMyFollowersOutPut } from './dto/getMyFollowers.output';
 import { getWhoIFollowOutput } from './dto/getWhoIFollow.output';
-import { findAllOutput } from './entities/finAllAuthor.output';
+import { GraphQLUpload, FileUpload } from 'graphql-upload';
+import * as fs from 'fs/promises';
+import { Response } from 'express';
 
 @Resolver(() => Author)
 export class AuthorResolver {
   constructor(private readonly authorService: AuthorService) {}
 
-  @Mutation(() => Author)
+  @Mutation(() => String, { name: 'ProfilePhoto' })
+  async uploadPhoto(
+    @Args('file', { type: () => GraphQLUpload }) file: FileUpload,
+  ): Promise<string> {
+    return await this.authorService.uploadPhoto(file)
+  }
+
+  @Query(() => String)
+  @UseGuards(new AuthGuard)
+  getProfilePhoto(@Res()response : Response , @Context() context){
+    return this.authorService.getProfilePhoto(context , response)
+  }
+  
+
+  @Mutation(() => AuthMessage)
   createAuthor(@Args('createAuthorInput') createAuthorInput: CreateAuthorInput) {
     return this.authorService.create(createAuthorInput);
   }
@@ -24,9 +40,15 @@ export class AuthorResolver {
     return this.authorService.Login(loginUnput)
   }
 
-  @Query(() => [findAllOutput], { name: 'authors' })
+  @Query(() => [Author], { name: 'authors' })
   author() {
     return this.authorService.findAll();
+  }
+
+  @Query(() => Author, { name: 'validAuthor' })
+  @UseGuards(new AuthGuard())
+  validAuthor(@Context() context) {
+    return this.authorService.valid(context);
   }
 
   @Query(() => Author)

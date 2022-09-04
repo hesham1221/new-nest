@@ -15,14 +15,9 @@ export class TweetsService {
     private authorService: AuthorService,
   ) {} 
 
-  async getAllTweets(context): Promise<GetAllTweetInput> {
+  async getAllTweets(): Promise<Tweet[]> {
     try {
-      const myTweets:Tweet[] = await this.TweetModel.findAll({where : {authorId : context.author.id } })
-      const otherTweets:Tweet[] = await this.TweetModel.findAll({where: {$authorId$: { [Op.not]: context.author.id}}})
-      return {
-        myTweets,
-        otherTweets
-      }
+      return await this.TweetModel.findAll()
     } catch (error) {
       throw new Error(error);
     }
@@ -60,7 +55,8 @@ export class TweetsService {
 
   async likers(tweetId : number){
     try {
-      return await this.authorService.findLikers(tweetId)
+      const likers = await this.authorService.findLikers(tweetId)
+      return likers
     } catch (error) {
       throw new Error(error)
     }

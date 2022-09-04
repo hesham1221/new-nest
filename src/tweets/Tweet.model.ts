@@ -32,6 +32,10 @@ export class Tweet extends Model<Tweet> {
   @Field(() => Int)
   authorId: number;
 
+  @Column
+  @Field(() => Date)
+  createdAt: Date;
+
   @HasMany(() => likers)
   @Field(() => [MyFollowersOutPut] , {nullable : true})
   likers? : MyFollowersOutPut[]

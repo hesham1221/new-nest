@@ -19,4 +19,5 @@ export class likers extends Model{
     @ForeignKey(() => Tweet)
     @Column
     tweetId : number
+    
 }

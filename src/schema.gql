@@ -15,6 +15,7 @@ type getMyFollowersOutPut {
 type Author {
   id: Int!
   username: String!
+  following: Boolean!
   numFollowers: Int!
   numFollowing: Int!
   tweets: [Tweet!]
@@ -24,22 +25,23 @@ type Tweet {
   id: Int!
   content: String!
   authorId: Int!
+  createdAt: DateTime!
   likers: [MyFollowersOutPut!]
   author: Author!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Message {
   message: String!
 }
 
-type GetAllTweetInput {
-  myTweets: [Tweet!]!
-  otherTweets: [Tweet!]!
-}
-
 type AuthMessage {
   token: String!
-  username: String!
+  author: Author!
 }
 
 type MyFollowingOutPut {
@@ -52,16 +54,13 @@ type getWhoIFollowOutput {
   whoYouFollowers: [MyFollowingOutPut!]!
 }
 
-type findAllOutput {
-  username: String!
-  id: Int!
-}
-
 type Query {
-  tweets: GetAllTweetInput!
+  tweets: [Tweet!]!
   myTweets: [Tweet!]!
+  getProfilePhoto: String!
   login(loginInput: CreateAuthorInput!): AuthMessage!
-  authors: [findAllOutput!]!
+  authors: [Author!]!
+  validAuthor: Author!
   findOneAuthor(id: Int!): Author!
   myFollowers: getMyFollowersOutPut!
   following: getWhoIFollowOutput!
@@ -76,7 +75,8 @@ type Mutation {
   updateATweet(updateATweet: UpdateATweet!): Tweet!
   DeleteATweet(deleteATweet: getATweetDto!): Message!
   createATweet(createTweetInput: CreateTweetInput!): Tweet!
-  createAuthor(createAuthorInput: CreateAuthorInput!): Author!
+  ProfilePhoto(file: Upload!): String!
+  createAuthor(createAuthorInput: CreateAuthorInput!): AuthMessage!
   updateAuthor(updateAuthorInput: UpdateAuthorInput!): Author!
   removeAuthor(username: String!): Message!
   follow(username: String!): Message!
@@ -96,6 +96,9 @@ input getATweetDto {
 input CreateTweetInput {
   content: String!
 }
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
 
 input UpdateAuthorInput {
   username: String

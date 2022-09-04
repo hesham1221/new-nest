@@ -5,6 +5,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { Author } from './entities/author.entity';
 import { Follow } from './entities/following.entity';
 import { likers } from 'src/tweets/likers.model';
+import { AuthorController } from './author.controller';
 
 @Module({
   providers: [AuthorResolver, AuthorService],
@@ -14,5 +15,6 @@ import { likers } from 'src/tweets/likers.model';
     SequelizeModule.forFeature([likers]),
   ],
   exports: [AuthorService],
+  controllers: [AuthorController],
 })
 export class AuthorModule {}
